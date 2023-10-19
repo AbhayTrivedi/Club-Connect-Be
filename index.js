@@ -8,11 +8,12 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 // no need to add passport local, since it is just required by passport-local-mongoose
+
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require("mongoose-findorcreate");
 
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(bodyParser());
 
 /**********************************************  chat  *************************************************/
 
-import chat from "./controllers/chat"
+import chat from "./controllers/chat";
 
 const http = require("http").createServer(app);
 chat(http);
@@ -59,20 +60,20 @@ connectToMongo();
 // mongoose.set("useCreateIndex", true);
 
 const userSchema = new mongoose.Schema({
-   username: { type: String},
-   password: { type: String},
+   username: { type: String },
+   password: { type: String },
 
 });
 
 userSchema.pre('save', async function (next) {
    if (!this.isModified("password")) {
-     next();
+      next();
    }
- 
+
    const salt = await bcrypt.genSalt(10);
    this.password = await bcrypt.hash(this.password, salt);
    next();
- });
+});
 
 
 userSchema.plugin(passportLocalMongoose);
@@ -160,20 +161,20 @@ app.get("/login", function (req, res) {
 
 app.post("/sign-up", function (req, res) {
    console.log(req.body);
-   const {email , password} = req.body;
+   const { email, password } = req.body;
 
-   User.findOne({username: email}, function (err, foundUser) {
+   User.findOne({ username: email }, function (err, foundUser) {
       if (err) {
          console.log(err);
       } else {
          if (foundUser) {
-            res.send({message: "User already exits. Please try logging in."});
+            res.send({ message: "User already exits. Please try logging in." });
          }
 
          const newUser = new User({
-            username : email,
+            username: email,
             password
-         })
+         });
 
          // const user
 
@@ -184,23 +185,23 @@ app.post("/sign-up", function (req, res) {
             }
             else {
                console.log("Hello world");
-            
+
             }
-         })
-         
+         });
+
          // else{
-            // User.register({ username: req.body.email }, req.body.password, function (err, user) {
-            //    if (err) {
-            //       console.log(err);
-            //       // res.redirect("/sign-up");
-            //    }
-            //    else {
-            //       passport.authenticate("local")(req, res, function () {
-            //          // res.redirect("/");
-            //          console.log("Hello world");
-            //       });
-            //    }
-            // });
+         // User.register({ username: req.body.email }, req.body.password, function (err, user) {
+         //    if (err) {
+         //       console.log(err);
+         //       // res.redirect("/sign-up");
+         //    }
+         //    else {
+         //       passport.authenticate("local")(req, res, function () {
+         //          // res.redirect("/");
+         //          console.log("Hello world");
+         //       });
+         //    }
+         // });
          // }
       }
    });
